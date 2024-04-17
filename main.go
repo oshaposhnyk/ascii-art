@@ -2,26 +2,41 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
 	"strings"
+	"unicode"
 )
 
 const standartTemplate string = "templates/standard.txt"
 
 func main() {
 	flag.Parse()
-	run()
-}
-
-func run() {
-	lines, err := convertString(flag.Args()...)
+	result, err := run(flag.Args())
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	fmt.Fprintf(os.Stdout, "%s", &lines)
+	fmt.Fprint(os.Stdout, result)
+}
+
+func isASCII(s string) bool {
+	for i := 0; i < len(s); i++ {
+		if s[i] > unicode.MaxASCII {
+			return false
+		}
+	}
+	return true
+}
+
+func run(args []string) (string, error) {
+	lines, err := convertString(args...)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprint(&lines), nil
 }
 
 func convertString(args ...string) (Lines, error) {
@@ -29,17 +44,26 @@ func convertString(args ...string) (Lines, error) {
 	if len(args) == 0 {
 		return lines, nil
 	}
+	text := strings.Join(args, "")
+	if text == "" {
+		return lines, nil
+	}
+
+	if !isASCII(text) {
+		return lines, errors.New("only ASCII characters are allowed")
+	}
 
 	templateLines, err := openTemplateFile()
 	if err != nil {
 		return lines, err
 	}
 	if len(templateLines) > 0 {
-		text := strings.Join(args, "")
 		text = strings.ReplaceAll(text, "\\n", "\n")
 		byteArray := []byte(text)
 		line := Line{}
+		var lastRune rune
 		for _, v := range byteArray {
+			lastRune = rune(v)
 			if v == '\n' {
 				lines.addLine(line)
 				line = Line{}
@@ -48,7 +72,9 @@ func convertString(args ...string) (Lines, error) {
 			letter := templateLines[v-32]
 			line.addSymbol(letter)
 		}
-		lines.addLine(line)
+		if lastRune != '\n' {
+			lines.addLine(line)
+		}
 	}
 
 	return lines, nil

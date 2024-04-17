@@ -30,7 +30,7 @@ func (s *Symbol) len() int {
 	return len(s.symbolPart)
 }
 
-func (_ Line) makeRange(min, max int) []int {
+func (Line) makeRange(min, max int) []int {
 	a := make([]int, max-min)
 	for i := range a {
 		a[i] = min + i
@@ -55,7 +55,6 @@ func (l *Line) String() string {
 			}
 		}
 	}
-
 	return fmt.Sprintln(formatted)
 }
 
