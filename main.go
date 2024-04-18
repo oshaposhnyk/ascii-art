@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"embed"
 	"errors"
 	"flag"
 	"fmt"
@@ -21,6 +22,11 @@ func NewConfig(text string) Config {
 		template: "standard",
 	}
 }
+
+//go:embed standard.txt
+//go:embed shadow.txt
+//go:embed thinkertoy.txt
+var f embed.FS
 
 func main() {
 	flag.Parse()
@@ -100,11 +106,8 @@ func convertString(c Config) (Lines, error) {
 
 func openTemplateFile(tName string) ([]Symbol, error) {
 	symbols := make([]Symbol, 0)
-	tPath := "templates/" + tName + ".txt"
-	if _, err := os.Stat(tPath); errors.Is(err, os.ErrNotExist) {
-		return symbols, errors.New("this template is not supported")
-	}
-	template, err := os.Open(tPath)
+	tPath := tName + ".txt"
+	template, err := f.Open(tPath)
 	if err != nil {
 		return symbols, err
 	}
