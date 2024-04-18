@@ -71,11 +71,11 @@ func convertString(c Config) (Lines, error) {
 		return lines, errors.New("only ASCII characters are allowed")
 	}
 
-	templateLines, err := openTemplateFile(c.template)
+	tChars, err := openTemplateFile(c.template)
 	if err != nil {
 		return lines, err
 	}
-	if len(templateLines) > 0 {
+	if len(tChars) > 0 {
 		text := strings.ReplaceAll(c.text, "\\n", "\n")
 		byteArray := []byte(text)
 		line := Line{}
@@ -87,7 +87,7 @@ func convertString(c Config) (Lines, error) {
 				line = Line{}
 				continue
 			}
-			letter := templateLines[v-32]
+			letter := tChars[v-32]
 			line.addSymbol(letter)
 		}
 		if lastRune != '\n' {
