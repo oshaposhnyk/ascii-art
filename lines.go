@@ -3,31 +3,31 @@ package main
 import "fmt"
 
 type Symbol struct {
-	symbolPart []string
+	s []string
 }
 
 type Line struct {
-	symbols []Symbol
+	s []Symbol
 }
 
 type Lines struct {
-	lines []Line
+	l []Line
 }
 
 const symbolHeigh int = 8
 
 func (s *Symbol) addSymbolPart(part string) {
-	if len(s.symbolPart) < symbolHeigh {
-		s.symbolPart = append(s.symbolPart, part)
+	if len(s.s) < symbolHeigh {
+		s.s = append(s.s, part)
 	}
 }
 
 func (s *Symbol) getPart(index int) string {
-	return s.symbolPart[index]
+	return s.s[index]
 }
 
 func (s *Symbol) len() int {
-	return len(s.symbolPart)
+	return len(s.s)
 }
 
 func (Line) makeRange(min, max int) []int {
@@ -39,15 +39,15 @@ func (Line) makeRange(min, max int) []int {
 }
 
 func (l *Line) addSymbol(symbol Symbol) {
-	l.symbols = append(l.symbols, symbol)
+	l.s = append(l.s, symbol)
 }
 
 func (l *Line) String() string {
 	formatted := ""
 	sHeigh := l.makeRange(0, symbolHeigh)
-	if len(l.symbols) != 0 {
+	if len(l.s) != 0 {
 		for i, v := range sHeigh {
-			for _, s := range l.symbols {
+			for _, s := range l.s {
 				formatted += s.getPart(v)
 			}
 			if i != len(sHeigh)-1 {
@@ -59,12 +59,12 @@ func (l *Line) String() string {
 }
 
 func (ls *Lines) addLine(l Line) {
-	ls.lines = append(ls.lines, l)
+	ls.l = append(ls.l, l)
 }
 
 func (ls *Lines) String() string {
 	formatted := ""
-	for _, l := range ls.lines {
+	for _, l := range ls.l {
 		formatted += fmt.Sprint(&l)
 	}
 	return formatted
