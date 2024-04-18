@@ -7,33 +7,37 @@ import (
 
 func TestRun(t *testing.T) {
 	type inputResult struct {
-		input      string
-		resultFile string
+		c    Config
+		file string
 	}
+	const testDataDir = "testdata/main_functionality/"
 	testCases := []struct {
-		name   string
-		result inputResult
+		name string
+		r    inputResult
 	}{
-		{name: "EmptyString", result: inputResult{input: "", resultFile: "testdata/main_functionality/empty.txt"}},
-		{name: "NewLine", result: inputResult{input: "\n", resultFile: "testdata/main_functionality/newLine.txt"}},
-		{name: "Hello", result: inputResult{input: "hello", resultFile: "testdata/main_functionality/hello.txt"}},
-		{name: "HeL10", result: inputResult{input: "HeL10", resultFile: "testdata/main_functionality/hel10.txt"}},
-		{name: "HelloThere", result: inputResult{input: "Hello There", resultFile: "testdata/main_functionality/helloThere.txt"}},
-		{name: "1Hello2There", result: inputResult{input: "1Hello 2There", resultFile: "testdata/main_functionality/1hello2there.txt"}},
-		{name: "CurlyHelloThere", result: inputResult{input: "{Hello There}", resultFile: "testdata/main_functionality/curly_hello_there.txt"}},
-		{name: "HelloNewLine", result: inputResult{input: "Hello\nThere", resultFile: "testdata/main_functionality/hello_new_line.txt"}},
-		{name: "HellowNewLine", result: inputResult{input: "Hello\n\nThere", resultFile: "testdata/main_functionality/hello_2new_line.txt"}},
+		{name: "EmptyString", r: inputResult{c: NewConfig(""), file: "empty.txt"}},
+		{name: "NewLine", r: inputResult{c: NewConfig("\n"), file: "newLine.txt"}},
+		{name: "Hello", r: inputResult{c: NewConfig("hello"), file: "hello.txt"}},
+		{name: "HeL10", r: inputResult{c: NewConfig("HeL10"), file: "hel10.txt"}},
+		{name: "HelloThere", r: inputResult{c: NewConfig("Hello There"), file: "helloThere.txt"}},
+		{name: "1Hello2There", r: inputResult{c: NewConfig("1Hello 2There"), file: "1hello2there.txt"}},
+		{name: "CurlyHelloThere", r: inputResult{c: NewConfig("{Hello There}"), file: "curly_hello_there.txt"}},
+		{name: "HelloNewLine", r: inputResult{c: NewConfig("Hello\nThere"), file: "hello_new_line.txt"}},
+		{name: "HellowNewLine", r: inputResult{c: NewConfig("Hello\n\nThere"), file: "hello_2new_line.txt"}},
+		{name: "Curly", r: inputResult{c: NewConfig("{|}~"), file: "curly.txt"}},
+		{name: "HelloS", r: inputResult{c: Config{text: "hello", template: "standard"}, file: "hello.txt"}},
+		{name: "HelloWorldSh", r: inputResult{c: Config{text: "hello world", template: "shadow"}, file: "helloWorldShadow.txt"}},
+		{name: "N2MYT", r: inputResult{c: Config{text: "nice 2 meet you", template: "thinkertoy"}, file: "N2MYT.txt"}},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			file, err := os.ReadFile(tc.result.resultFile)
+			file, err := os.ReadFile(testDataDir + tc.r.file)
 			expected := string(file[:])
 			if err != nil {
 				t.Fatal(err)
 			}
-			input := []string{tc.result.input}
-			result, err := run(input)
+			result, err := run(tc.r.c)
 			if err != nil {
 				t.Fatal(err)
 			}
