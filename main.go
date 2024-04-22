@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"embed"
-	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -75,7 +74,7 @@ func convertString(c Config) (Lines, error) {
 	}
 
 	if !isASCII(c.text) {
-		return lines, errors.New("only ASCII characters are allowed")
+		return lines, ErrNoASCII
 	}
 
 	tChars, err := openTemplateFile(c.template)
@@ -110,7 +109,7 @@ func openTemplateFile(tName string) ([]Symbol, error) {
 	tPath := tName + ".txt"
 	template, err := f.Open(tPath)
 	if err != nil {
-		return symbols, err
+		return symbols, ErrInvalideTemplate
 	}
 	defer template.Close()
 
