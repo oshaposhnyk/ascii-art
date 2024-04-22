@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"os"
 	"testing"
 )
@@ -37,13 +38,14 @@ func TestRun(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			result, err := run(tc.r.c)
+			var res bytes.Buffer
+			err = run(tc.r.c, &res)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			if result != expected {
-				t.Errorf("Expected %s, got %s instead.\n", expected, result)
+			if res.String() != expected {
+				t.Errorf("Expected %s, got %s instead.\n", expected, res.String())
 			}
 
 		})

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 	"unicode"
@@ -42,12 +43,11 @@ func main() {
 	if len(args) > 1 {
 		config.template = args[1]
 	}
-	result, err := run(config)
+	err := run(config, os.Stdout)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	fmt.Fprint(os.Stdout, result)
 }
 
 func isASCII(s string) bool {
@@ -59,12 +59,13 @@ func isASCII(s string) bool {
 	return true
 }
 
-func run(c Config) (string, error) {
+func run(c Config, w io.Writer) error {
 	lines, err := convertString(c)
 	if err != nil {
-		return "", err
+		return err
 	}
-	return fmt.Sprint(&lines), nil
+	fmt.Fprint(w, fmt.Sprint(&lines))
+	return nil
 }
 
 func convertString(c Config) (Lines, error) {
