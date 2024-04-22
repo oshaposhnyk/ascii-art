@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type Symbol struct {
 	s []string
@@ -28,6 +31,18 @@ func (s *Symbol) getPart(index int) string {
 
 func (s *Symbol) len() int {
 	return len(s.s)
+}
+
+func CreateFromStr(str string) Symbol {
+	s := strings.Split(str, "\n")
+	if len(s) == 9 {
+		if s[0] == "" {
+			s = s[1:]
+		} else if s[8] == "" {
+			s = s[:8]
+		}
+	}
+	return Symbol{s: s}
 }
 
 func (Line) makeRange(min, max int) []int {

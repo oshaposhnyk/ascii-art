@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"embed"
 	"flag"
 	"fmt"
@@ -27,6 +26,8 @@ func NewConfig(text string) Config {
 //go:embed shadow.txt
 //go:embed thinkertoy.txt
 var f embed.FS
+
+const offset = 32
 
 func main() {
 	flag.Parse()
@@ -72,12 +73,16 @@ func convertString(c Config) (Lines, error) {
 	if c.text == "" {
 		return lines, nil
 	}
+	if c.text == "\n" {
+		lines.addLine(Line{})
+		return lines, nil
+	}
 
 	if !isASCII(c.text) {
 		return lines, ErrNoASCII
 	}
 
-	tChars, err := openTemplateFile(c.template)
+	tChars, err := openTemplateFile(c.template, c.text)
 	if err != nil {
 		return lines, err
 	}
@@ -93,7 +98,7 @@ func convertString(c Config) (Lines, error) {
 				line = Line{}
 				continue
 			}
-			letter := tChars[v-32]
+			letter := tChars[v]
 			line.addSymbol(letter)
 		}
 		if lastRune != '\n' {
@@ -104,35 +109,19 @@ func convertString(c Config) (Lines, error) {
 	return lines, nil
 }
 
-func openTemplateFile(tName string) ([]Symbol, error) {
-	symbols := make([]Symbol, 0)
+func openTemplateFile(tName, text string) (map[byte]Symbol, error) {
+	result := map[byte]Symbol{}
 	tPath := tName + ".txt"
-	template, err := f.Open(tPath)
+	content, err := os.ReadFile(tPath)
 	if err != nil {
-		return symbols, ErrInvalideTemplate
+		return result, ErrInvalideTemplate
 	}
-	defer template.Close()
-
-	sc := bufio.NewScanner(template)
-
-	symbol := Symbol{}
-	for sc.Scan() {
-		if sc.Text() == "" {
-			if symbol.len() != 0 {
-				symbols = append(symbols, symbol)
-				symbol = Symbol{}
-			}
-			continue
+	tCont := strings.ReplaceAll(string(content), "\r\n", "\n")
+	sText := strings.Split(tCont, "\n\n")
+	for i, sym := range sText {
+		if strings.ContainsRune(text, rune(i+offset)) {
+			result[byte(i+offset)] = CreateFromStr(sym)
 		}
-		symbol.addSymbolPart(sc.Text())
 	}
-
-	if symbol.len() != 0 {
-		symbols = append(symbols, symbol)
-	}
-
-	if err := sc.Err(); err != nil {
-		return make([]Symbol, 0), err
-	}
-	return symbols, nil
+	return result, nil
 }
