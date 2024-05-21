@@ -1,4 +1,4 @@
-package main
+package ascii
 
 import (
 	"bytes"
@@ -26,9 +26,9 @@ func TestRun(t *testing.T) {
 		{name: "HelloNewLine", r: inputResult{c: NewConfig("Hello\nThere"), file: "hello_new_line.txt"}},
 		{name: "HellowNewLine", r: inputResult{c: NewConfig("Hello\n\nThere"), file: "hello_2new_line.txt"}},
 		{name: "Curly", r: inputResult{c: NewConfig("{|}~"), file: "curly.txt"}},
-		{name: "HelloS", r: inputResult{c: Config{text: "hello", template: "standard"}, file: "hello.txt"}},
-		{name: "HelloWorldSh", r: inputResult{c: Config{text: "hello world", template: "shadow"}, file: "helloWorldShadow.txt"}},
-		{name: "N2MYT", r: inputResult{c: Config{text: "nice 2 meet you", template: "thinkertoy"}, file: "N2MYT.txt"}},
+		{name: "HelloS", r: inputResult{c: Config{Text: "hello", Template: "standard"}, file: "hello.txt"}},
+		{name: "HelloWorldSh", r: inputResult{c: Config{Text: "hello world", Template: "shadow"}, file: "helloWorldShadow.txt"}},
+		{name: "N2MYT", r: inputResult{c: Config{Text: "nice 2 meet you", Template: "thinkertoy"}, file: "N2MYT.txt"}},
 	}
 
 	for _, tc := range testCases {
@@ -39,7 +39,7 @@ func TestRun(t *testing.T) {
 				t.Fatal(err)
 			}
 			var res bytes.Buffer
-			err = run(tc.r.c, &res)
+			err = Run(tc.r.c, &res)
 			if err != nil {
 				t.Fatal(err)
 			}
