@@ -1,4 +1,4 @@
-package main
+package ascii
 
 import "errors"
 
